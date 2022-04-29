@@ -4,18 +4,12 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
+const cors = require("cors");
+app.use(cors());
 
 
 io.on('connection', (socket) => {
-    socket.on('chat message', (msg) => {
-      io.emit('chat message', msg);
-    });
-    socket.on('p1', (pos) => {
-
-    })
-    socket.on('p2', (pos) => {
-        
-    })
+    console.log("NEW USER: ", socket.id);
 });
 
 app.use(express.static('public'))
