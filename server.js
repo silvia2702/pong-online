@@ -7,9 +7,15 @@ const io = new Server(server);
 const cors = require("cors");
 app.use(cors());
 
+const users = {};
 
 io.on('connection', (socket) => {
     console.log("NEW USER: ", socket.id);
+
+    socket.on("new-user", (gameTag) => {
+      users[gameTag]= socket.id;
+      io.emit("new-player", users);
+    })
 });
 
 app.use(express.static('public'))
