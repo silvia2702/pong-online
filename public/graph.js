@@ -169,6 +169,7 @@ function store(x, y, s, c) {
         "color": c
     }
     linesArray.push(line);
+    sendDrawData(linesArray);
 }
 
 // ON MOUSE UP
