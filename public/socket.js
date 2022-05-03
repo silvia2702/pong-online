@@ -4,3 +4,7 @@ socket.on("connect", () => {
     const username = prompt("username", "no_name");
     socket.emit("new-user", username);
 })
+
+socket.on("new-player", player => {
+    
+})
