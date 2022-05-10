@@ -14,21 +14,56 @@ const io = new Server(server,
 const cors = require("cors");
 app.use(cors());
 
+const TIME_LIMIT = 60
 const users = {};
+const queue = [];
+
+let timer = TIME_LIMIT
+let currentRound = 0
+let word = ""
+let interval
+
 
 io.on('connection', (socket) => {
     console.log("NEW USER: ", socket.id);
 
     socket.on("new-user", (gameTag) => {
       users[gameTag]= socket.id;
-      io.emit("new-player", users);
-      })
+      queue.push(gameTag)
+      if(nextInQueue(gameTag))io.to(users[username]).emit("choose-word")
+      io.emit("new-player", users)
+    })
+
+
 
       socket.on("draw-input", (draw) => {
         io.emit("draw-output", draw)
       })
 
+      socket.on("start-game", (w) => {
+        word = w
+        interval = startTimer()
+      })
+
       socket.on("disconnect", (reason) => handleDisconnect(socket, reason))
+
+      function startTimer() {
+        return setInterval(()=>{
+          time--
+
+          if(timer > 0){
+          io.emit("timer", time)
+          }else {
+            clearInterval(interval)
+            io.emit("times-up")
+            queue.forEach(player => {
+              if(nextInQueue(player)) io.to(users[player]).emit("choose-word")
+            })
+          }
+            
+          
+        })
+      }
 
   });
 
@@ -39,6 +74,11 @@ io.on('connection', (socket) => {
         console.log("USER:", key, "disconnected, reason:", reason)
       }
     })
+  }
+
+  function nextInQueue (user){
+    if(queue[currentRound % queue.legnth] ===user) true
+    else return false
   }
 
 app.use(express.static('public'))
